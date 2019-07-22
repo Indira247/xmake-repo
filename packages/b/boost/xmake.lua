@@ -56,7 +56,7 @@ package("boost")
             "--libdir=" .. package:installdir("lib"),
             "--without-icu"
         }
-        local libs = {}
+        local libs_enabled  = {}
         local libnames = {"filesystem", 
                           "fiber", 
                           "coroutine", 
@@ -77,11 +77,17 @@ package("boost")
                           "iostreams"}
         for _, libname in ipairs(libnames) do
             if package:config(libname) then
-                table.insert(libs, libname)
+                table.insert(libs_enabled, libname)
             end
         end
-        if #libs > 0 then
-            table.insert(bootstrap_argv, "--with-libraries=" .. table.concat(libs, ","))
+        if #libs_enabled > 0 then
+            if is_host("windows") then
+                for _, libname in ipairs(libs_enabled) do
+                    table.insert(bootstrap_argv, "--with-" .. libname)
+                end
+            else
+                table.insert(bootstrap_argv, "--with-libraries=" .. table.concat(libs_enabled, ","))
+            end
         end
         local argv =
         {
@@ -96,8 +102,8 @@ package("boost")
             "-sNO_ZSTD=1",
             "install",
             "threading=" .. (package:config("multi") and "multi" or "single"),
-            "link=static",
-            "cxxflags=-std=c++14"
+            "debug-symbols=" .. (package:debug() and "on" or "off"),
+            "link=static"
         }
         local arch = package:arch()
         if arch == "x64" or arch == "x86_64" then
@@ -105,7 +111,16 @@ package("boost")
         else
             table.insert(argv, "address-model=32")
         end
-        table.insert(argv, "debug-symbols=" .. (package:debug() and "on" or "off"))
+        if package:plat() == "windows" then
+            local vs_runtime = package:config("vs_runtime")
+            if vs_runtime and vs_runtime:startswith("MT") then
+                table.insert(argv, "runtime-link=static")
+            else
+                table.insert(argv, "runtime-link=shared")
+            end
+        else
+            table.insert(argv, "cxxflags=-std=c++14")
+        end
         if is_host("windows") then
             os.vrunv("bootstrap.bat", bootstrap_argv)
         else
