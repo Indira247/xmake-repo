@@ -89,8 +89,7 @@ package("boost")
             "--libdir=" .. package:installdir("lib"), 
             "-d2",
             "-j4",
-            "--layout=system",
---            "--layout=tagged-1.66",
+            "--layout=tagged-1.66",
             "--user-config=user-config.jam",
             "--no-cmake-config",
             "-sNO_LZMA=1",
@@ -100,6 +99,13 @@ package("boost")
             "link=static",
             "cxxflags=-std=c++14"
         }
+        local arch = package:arch()
+        if arch == "x64" or arch == "x86_64" then
+            table.insert(argv, "--address-model=64")
+        else
+            table.insert(argv, "--address-model=32")
+        end
+        table.insert(argv, "--debug-symbols=" .. (package:debug() and "on" or "off"))
         if is_host("windows") then
             os.vrunv("bootstrap.bat", bootstrap_argv)
         else
