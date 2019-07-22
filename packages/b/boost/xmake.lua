@@ -76,14 +76,14 @@ package("boost")
                           "locale",
                           "iostreams"}
         for _, libname in ipairs(libnames) do
-            if package:config(libname) then
+            if not package:config(libname) then
                 table.insert(libs_enabled, libname)
             end
         end
         if #libs_enabled > 0 then
             if is_host("windows") then
                 for _, libname in ipairs(libs_enabled) do
-                    table.insert(bootstrap_argv, "--with-" .. libname)
+                    table.insert(bootstrap_argv, "--without-" .. libname)
                 end
             else
                 table.insert(bootstrap_argv, "--with-libraries=" .. table.concat(libs_enabled, ","))
