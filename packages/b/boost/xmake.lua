@@ -101,11 +101,11 @@ package("boost")
         }
         local arch = package:arch()
         if arch == "x64" or arch == "x86_64" then
-            table.insert(argv, "--address-model=64")
+            table.insert(argv, "address-model=64")
         else
-            table.insert(argv, "--address-model=32")
+            table.insert(argv, "address-model=32")
         end
-        table.insert(argv, "--debug-symbols=" .. (package:debug() and "on" or "off"))
+        table.insert(argv, "debug-symbols=" .. (package:debug() and "on" or "off"))
         if is_host("windows") then
             os.vrunv("bootstrap.bat", bootstrap_argv)
         else
