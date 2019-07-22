@@ -95,6 +95,7 @@ package("boost")
             "--libdir=" .. package:installdir("lib"), 
             "-d2",
             "-j4",
+            "--hash",
             "--layout=tagged-1.66",
             "--user-config=user-config.jam",
             "--no-cmake-config",
