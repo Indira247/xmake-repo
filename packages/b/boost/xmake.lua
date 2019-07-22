@@ -81,13 +81,13 @@ package("boost")
             end
         end
         if #libs_enabled > 0 then
-            if is_host("windows") then
+           --[[ if is_host("windows") then
                 for _, libname in ipairs(libs_enabled) do
                     table.insert(bootstrap_argv, "--without-" .. libname)
                 end
-            else
-                table.insert(bootstrap_argv, "--with-libraries=" .. table.concat(libs_enabled, ","))
-            end
+            else]]
+                table.insert(bootstrap_argv, "--without-libraries=" .. table.concat(libs_enabled, ","))
+            --end
         end
         local argv =
         {
