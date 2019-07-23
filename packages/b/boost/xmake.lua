@@ -42,7 +42,7 @@ package("boost")
     on_load("windows", function (package)
         local vs_runtime = package:config("vs_runtime")
         for _, libname in ipairs(libnames) do
-            local linkname = "lib" .. libname
+            local linkname = "libboost_" .. libname
             if package:config("multi") then
                 linkname = linkname .. "-mt"
             end
