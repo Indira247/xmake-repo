@@ -15,25 +15,47 @@ package("boost")
         add_deps("bzip2", "zlib")
     end
 
-    add_configs("multi",         { description = "Enable multi-thread support.",  default = true, type = "boolean"})
-    add_configs("filesystem",    { description = "Enable filesystem library.",    default = false, type = "boolean"})
-    add_configs("fiber",         { description = "Enable fiber library.",         default = false, type = "boolean"})
-    add_configs("coroutine",     { description = "Enable coroutine library.",     default = false, type = "boolean"})
-    add_configs("context",       { description = "Enable context library.",       default = true, type = "boolean"})
-    add_configs("thread",        { description = "Enable thread library.",        default = false, type = "boolean"})
-    add_configs("regex",         { description = "Enable regex library.",         default = false, type = "boolean"})
-    add_configs("system",        { description = "Enable system library.",        default = false, type = "boolean"})
-    add_configs("container",     { description = "Enable container library.",     default = false, type = "boolean"})
-    add_configs("exception",     { description = "Enable exception library.",     default = false, type = "boolean"})
-    add_configs("timer",         { description = "Enable timer library.",         default = false, type = "boolean"})
-    add_configs("atomic",        { description = "Enable atomic library.",        default = false, type = "boolean"})
-    add_configs("graph",         { description = "Enable graph library.",         default = false, type = "boolean"})
-    add_configs("serialization", { description = "Enable serialization library.", default = false, type = "boolean"})
-    add_configs("random",        { description = "Enable random library.",        default = false, type = "boolean"})
-    add_configs("wave",          { description = "Enable wave library.",          default = false, type = "boolean"})
-    add_configs("date_time",     { description = "Enable date time library.",     default = false, type = "boolean"})
-    add_configs("locale",        { description = "Enable locale library.",        default = false, type = "boolean"})
-    add_configs("iostreams",     { description = "Enable iostreams library.",     default = false, type = "boolean"})
+    local libnames = {"filesystem", 
+                      "fiber", 
+                      "coroutine", 
+                      "context", 
+                      "thread", 
+                      "regex",
+                      "system",
+                      "container",
+                      "exception",
+                      "timer",
+                      "atomic",
+                      "graph",
+                      "serialization",
+                      "random",
+                      "wave",
+                      "date_time",
+                      "locale",
+                      "iostreams"}
+
+    add_configs("multi",        { description = "Enable multi-thread support.",  default = true, type = "boolean"})
+    for _, libname in ipairs(libnames) do
+        add_configs(libname,    { description = "Enable " .. libname .. " library.", default = (libname == "filesystem"), type = "boolean"})
+    end
+
+    on_load("windows", function (package)
+        local vs_runtime = package:config("vs_runtime")
+        for _, libname in ipairs(libnames) do
+            local linkname = "lib" .. libname
+            if package:config("multi") then
+                linkname = linkname .. "-mt"
+            end
+            if vs_runtime == "MT" then
+                linkname = linkname .. "-s"
+            elseif vs_runtime == "MTd" then
+                linkname = linkname .. "-sgd"
+            elseif vs_runtime == "MDd" then
+                linkname = linkname .. "-gd"
+            end
+            package:add("links", linkname)
+        end
+    end)
 
     on_install("macosx", "linux", "windows", function (package)
     
@@ -96,24 +118,6 @@ package("boost")
         else
             table.insert(argv, "cxxflags=-std=c++14")
         end
-        local libnames = {"filesystem", 
-                          "fiber", 
-                          "coroutine", 
-                          "context", 
-                          "thread", 
-                          "regex",
-                          "system",
-                          "container",
-                          "exception",
-                          "timer",
-                          "atomic",
-                          "graph",
-                          "serialization",
-                          "random",
-                          "wave",
-                          "date_time",
-                          "locale",
-                          "iostreams"}
         for _, libname in ipairs(libnames) do
             if package:config(libname) then
                 table.insert(argv, "--with-" .. libname)
