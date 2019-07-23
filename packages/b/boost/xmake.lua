@@ -16,7 +16,7 @@ package("boost")
     end
 
     add_configs("multi",         { description = "Enable multi-thread support.",  default = true, type = "boolean"})
-    add_configs("filesystem",    { description = "Enable filesystem library.",    default = true, type = "boolean"})
+    add_configs("filesystem",    { description = "Enable filesystem library.",    default = false, type = "boolean"})
     add_configs("fiber",         { description = "Enable fiber library.",         default = false, type = "boolean"})
     add_configs("coroutine",     { description = "Enable coroutine library.",     default = false, type = "boolean"})
     add_configs("context",       { description = "Enable context library.",       default = true, type = "boolean"})
