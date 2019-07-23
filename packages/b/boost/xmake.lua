@@ -56,31 +56,13 @@ package("boost")
             "--libdir=" .. package:installdir("lib"),
             "--without-icu"
         }
-        local libs_enabled  = {}
-        local libnames = {"filesystem", 
-                          "fiber", 
-                          "coroutine", 
-                          "context", 
-                          "thread", 
-                          "regex",
-                          "system",
-                          "container",
-                          "exception",
-                          "timer",
-                          "atomic",
-                          "graph",
-                          "serialization",
-                          "random",
-                          "wave",
-                          "date_time",
-                          "locale",
-                          "iostreams"}
-        for _, libname in ipairs(libnames) do
-            if package:config(libname) then
-                table.insert(libs_enabled, libname)
-            end
+        if is_host("windows") then
+            os.vrunv("bootstrap.bat", bootstrap_argv)
+        else
+            os.vrunv("./bootstrap.sh", bootstrap_argv)
         end
-        
+        os.vrun("./b2 headers")
+
         local argv =
         {
             "--prefix=" .. package:installdir(), 
@@ -114,19 +96,29 @@ package("boost")
         else
             table.insert(argv, "cxxflags=-std=c++14")
         end
-        if #libs_enabled > 0 then
-           
-                for _, libname in ipairs(libs_enabled) do
-                    table.insert(argv, "--with-" .. libname)
-                end
-            
+        local libnames = {"filesystem", 
+                          "fiber", 
+                          "coroutine", 
+                          "context", 
+                          "thread", 
+                          "regex",
+                          "system",
+                          "container",
+                          "exception",
+                          "timer",
+                          "atomic",
+                          "graph",
+                          "serialization",
+                          "random",
+                          "wave",
+                          "date_time",
+                          "locale",
+                          "iostreams"}
+        for _, libname in ipairs(libnames) do
+            if package:config(libname) then
+                table.insert(argv, "--with-" .. libname)
+            end
         end
-        if is_host("windows") then
-            os.vrunv("bootstrap.bat", bootstrap_argv)
-        else
-            os.vrunv("./bootstrap.sh", bootstrap_argv)
-        end
-        os.vrun("./b2 headers")
         os.vrunv("./b2", argv)
     end)
 
