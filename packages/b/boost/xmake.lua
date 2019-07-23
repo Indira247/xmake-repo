@@ -115,6 +115,7 @@ package("boost")
             else
                 table.insert(argv, "runtime-link=shared")
             end
+            table.insert(argv, "cxxflags=-std:c++14")
         else
             table.insert(argv, "cxxflags=-std=c++14")
         end
