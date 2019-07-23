@@ -117,7 +117,7 @@ package("boost")
         if #libs_enabled > 0 then
            
                 for _, libname in ipairs(libs_enabled) do
-                    table.insert(bootstrap_argv, "--with-" .. libname)
+                    table.insert(argv, "--with-" .. libname)
                 end
             
         end
